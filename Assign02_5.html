@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location through pin</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+    <script>
+        $(document).ready(() => {
+            console.log("Page loaded");
+            $('#AccountNo').blur(() => {
+                console.log("Blur event occurred");
+                let input = {pin: $('#AccountNo').val()}
+
+                let parameterstothefunction = {
+                    data: input,
+                    url: 'http://localhost:900/getareaname',
+                    type: 'get',
+                    datatype: 'json',
+                    success: function (datafromserver) {
+                        console.log("Data fetched successfully");
+                        console.log(datafromserver);
+                        if(datafromserver.status === true){
+                            $('#msg').val(datafromserver.detail.Balance);
+                            $('#msg').text("Balance Found");
+                        }
+                        else{
+                            $('#Balance').val("");
+                            $('#msg').text("Balance not found");
+                        }
+                    },
+                    error: function(errorfromserver) {
+                        console.log("some error occurred"+errorfromserver);
+                    }
+                }
+
+                $.ajax(parameterstothefunction);
+            });
+        });
+    </script>
+</head>
+<body>
+    <input type="number" id="AccountNo" name="AccountNo" placeholder="AccountNo"><br><br>
+     <span id="msg"></span>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+  <script>
+
+    $(
+      () => {
+        //assume these details came from the server
+        //logic function
+        function getItemOnItemno(itemno) {
+
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].itemno == itemno) {
+              output.itemnofoundstatus = true;
+              output.itemdetails = items[i];
+              break;
+
+            }
+
+          }
+
+          return output;
+
+
+        }
+
+        function updateItem(updatedObject) {
+          let updated = false;
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].itemno == updatedObject.itemno) {
+              items[i].price = updatedObject.price;
+              items[i].itemname = updatedObject.itemname;
+              updated = true;
+              break;
+
+            }
+          }
+
+          return updated;
+
+        }
+
+        //ui function
+        function showContents() {
+          let ajaxparams = {
+            data: {},
+            url: "http://localhost:900/getAllItems",
+            type: 'get',
+            dataType: "json",
+            success: (dgbs) => {
+              items = dgbs;
+
+              let itemscontents = "";
+              for (let i = 0; i < items.length; i++) {
+                itemscontents += "<br/>" + items[i].itemno + "  " + items[i].itemname + " " + items[i].price;
+              }
+              $("#contents").html(itemscontents);
+
+            },
+            error: (error) => { console.log("failure " + error) }
+
+          };
+          $.ajax(ajaxparams);
+
+        }
+
+       
+
+
+        $("#itemno").blur(() => {
+
+         
+          let y = $("#itemno").val();
+
+
+
+          document.querySelector("#itemno").disabled = true;
+
+          let ajaxparams = {
+            data: { x: y },
+            url: "http://localhost:900/getItem",
+            type: 'get',
+            dataType: "json",
+            success: (output) => {
+
+              if (output.itemnofoundstatus) {
+
+
+                $("#message").text("item details found");
+
+                $("#itemname").val(output.itemdetails.itemname);
+
+                document.querySelector("#itemname").value =
+                  output.itemdetails.itemname;
+
+
+                $("#itemprice").val(output.itemdetails.price);
+
+              }
+
+              else {
+
+                $("#message").text("item details not found");
+                $("#itemname").val("");
+                $("#itemprice").val("");
+
+
+              }
+
+            },
+            error: (error) => { console.log("failure " + error) }
+
+          };
+          $.ajax(ajaxparams);
+
+        });
+
+
+       
+        $("#add").click(
+          () => {
+
+            let input = {
+              x: $("#itemno").val(),
+              y: $("#itemname").val(),
+               z: $("#itemprice").val()
+            };
+
+            let ajaxparams = {
+              data: input,
+              url: "http://localhost:900/addItem",
+              type: 'get',
+              dataType: "json",
+              success: (output) => {
+
+
+                if (output) {
+                  
+                  $("#message").text("added succesfully");
+                  $("#message").removeClass("nm").addClass("em");
+
+                }
+                else {
+                  $("#message").text("could not add item");
+
+                }
+                $("#itemname").val("");
+                $("#itemprice").val("");
+
+                showContents();
+                document.querySelector("#itemno").disabled = false;
+
+              },
+              error: (errr) => { console.log("failure" + errr); }
+            };
+            $.ajax(ajaxparams);
+
+           
+          }); 
+
+        $("#update").click(() => {
+
+      
+          let input = {
+            itemno: $("#itemno").val(),
+            itemname: $("#itemname").val(), price: $("#itemprice").val()
+          };
+
+          let ajaxparams = {
+
+            data: input,
+            url: "http://localhost:900/updateitem",
+            type: 'get',
+            dataType: "json",
+            success: (output) => {
+
+            
+              if (output) {
+                $("#message").text("updated successfully");
+                $("#message").removeClass("em").addClass("nm");
+
+              }
+              else {
+
+                $("#message").text("could not update item");
+
+
+              }
+              $("#itemname").val("");
+              $("#itemprice").val("");
+
+              showContents();
+
+              document.querySelector("#itemno").disabled = false;
+              document.querySelector("#itemno").focus();
+
+            },
+            error: (mistake) => { console.log("error " + mistake); }
+          };
+          $.ajax(ajaxparams);
+
+        });
+        showContents();
+
+      });
+
+  </script>
+  <style>
+    .em {
+      color: rgb(252, 2, 2)
+        
+    }
+
+    .nm {
+      color: rgb(255, 255, 0)
+    }
+  </style>
+</head>
+
+<body>
+  <Br />
+  <input type="text" id="itemno" placeholder="item number" />
+  <span id="message"> what happened</span>
+  <Br />
+  <input type="text" id="itemname" placeholder="item name" />
+  <Br />
+  <input type="text" id="itemprice" placeholder="item price" />
+  <br /><br /><button id="add">Add Item</button>
+  <button id="update">update Item</button>
+  <hr />
+  <p id="contents"> all items show it here</p>
+
+
+</body>
+
+</html>

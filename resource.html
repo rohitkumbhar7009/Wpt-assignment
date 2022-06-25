@@ -1,0 +1,250 @@
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+  <script>
+
+    $(
+      () => {
+        //assume these details came from the server
+        //logic function
+        function getItemOnItemno(resourceid) {
+
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].resourceid == resourceid) {
+              output.itemnofoundstatus = true;
+              output.itemdetails = items[i];
+              break;
+
+            }
+
+          }
+
+          return output;
+
+
+        }
+
+        function updateItem(updatedObject) {
+          let updated = false;
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].resourceid == updatedObject.resourceid) {
+              items[i].status = updatedObject.status;
+              items[i].resourcename = updatedObject.resourcename;
+              updated = true;
+              break;
+
+            }
+          }
+
+          return updated;
+
+        }
+
+        //ui function
+        function showContents() {
+          let ajaxparams = {
+            data: {},
+            url: "http://localhost:900/getAllItems",
+            type: 'get',
+            dataType: "json",
+            success: (dgbs) => {
+              items = dgbs;
+
+              let itemscontents = "";
+              for (let i = 0; i < items.length; i++) {
+                itemscontents += "<br/>" + items[i].resourceid + "  " + items[i].resourcename + " " + items[i].status;
+              }
+              $("#contents").html(itemscontents);
+
+            },
+            error: (error) => { console.log("failure " + error) }
+
+          };//end of the object creation for ajaxparams
+          $.ajax(ajaxparams);
+
+        }
+
+        //setting up on blur.. writing comments not a good idea.
+
+
+        $("#itemno").blur(() => {
+
+          //difficult things begin
+          //the below line is input
+          let y = $("#itemno").val();
+
+
+
+          document.querySelector("#itemno").disabled = true;
+
+          let ajaxparams = {
+            data: { x: y },
+            url: "http://localhost:900/getItem",
+            type: 'get',
+            dataType: "json",
+            success: (output) => {
+
+              if (output.itemnofoundstatus) {
+
+
+                $("#message").text("item details found");
+
+                $("#itemname").val(output.itemdetails.resourcename);
+
+                document.querySelector("#itemname").value =
+                  output.itemdetails.resourcename;
+
+                  if($("#itemprice").val()==0 || $("#itemprice").val()==1){
+                  $("#itemprice").val(output.itemdetails.status);
+                  }
+                  else{
+                    $("#message").text("status value is incorrect");
+                  }
+              }
+
+              else {
+
+                $("#message").text("item details not found");
+                $("#itemname").val("");
+                $("#itemprice").val("");
+
+
+              }
+
+            },
+            error: (error) => { console.log("failure " + error) }
+
+          };//end of the object creation for ajaxparams
+          $.ajax(ajaxparams);
+
+        });//end of the blur event on itemno
+
+
+        //setup the add button event 
+        /*
+        let add=document.querySelector("#add");
+        add.addEventListener('click',
+        */
+
+        $("#add").click(
+          () => {
+
+            let input = {
+              x: $("#itemno").val(),
+              y: $("#itemname").val(),
+               z: $("#itemprice").val()
+            };
+
+            let ajaxparams = {
+              data: input,
+              url: "http://localhost:900/addItem",
+              type: 'get',
+              dataType: "json",
+              success: (output) => {
+
+
+                if (output) {
+                  //message.innerText="added successfully";
+                  $("#message").text("added succesfully");
+                  $("#message").removeClass("nm").addClass("em");
+
+                }
+                else {
+                  $("#message").text("could not add item");
+
+                }
+                $("#itemname").val("");
+                $("#itemprice").val("");
+
+                showContents();
+                document.querySelector("#itemno").disabled = false;
+
+              },
+              error: (errr) => { console.log("failure" + errr); }
+            };
+            $.ajax(ajaxparams);
+
+            //doing ajax call focus only two things
+            //pass input correctly and see what server is giving us that's all.
+            // let output=addItem(input);//kids world
+
+          }); //end of add event
+
+        $("#update").click(() => {
+
+          //hard thing begins
+          let input = {
+            resourceid: $("#itemno").val(),
+            resourcename: $("#itemname").val(), status: $("#itemprice").val()
+          };
+
+          let ajaxparams = {
+
+            data: input,
+            url: "http://localhost:900/updateitem",
+            type: 'get',
+            dataType: "json",
+            success: (output) => {
+
+              //only after you got data from the server, update the ui
+              if (output) {
+                $("#message").text("updated successfully");
+                $("#message").removeClass("em").addClass("nm");
+
+              }
+              else {
+
+                $("#message").text("could not update item");
+
+
+              }
+              $("#itemname").val("");
+              $("#itemprice").val("");
+
+              showContents();
+
+              document.querySelector("#itemno").disabled = false;
+              document.querySelector("#itemno").focus();
+
+            },
+            error: (mistake) => { console.log("error " + mistake); }
+          };
+          $.ajax(ajaxparams);
+
+        });
+        showContents();
+
+      });
+
+  </script>
+  <style>
+    .em {
+      color: green
+        /* total stupid */
+    }
+
+    .nm {
+      color: blue
+    }
+  </style>
+</head>
+
+<body>
+  <Br />
+  <input type="text" id="itemno" placeholder="resource number" />
+  <span id="message"> what happened</span>
+  <Br />
+  <input type="text" id="itemname" placeholder="resource name" />
+  <Br />
+  <input type="text" id="itemprice" placeholder="status" />
+  <br /><br /><button id="add">Add Item</button>
+  <button id="update">update Item</button>
+  <hr />
+  <p id="contents"> all items show it here</p>
+
+
+</body>
+
+</html>
