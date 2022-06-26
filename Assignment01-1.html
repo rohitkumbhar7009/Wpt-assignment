@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment01-1</title>
+    <h1>Assignment01-1</h1>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            //Creating an Array having Numbers from 1 - 100 on random basis
+            let A = [];
+            for(let i=0; i<10; i++){
+                A[i] = Math.floor((Math.random() * 100) + 1);
+            }
+            console.log(A);
+            
+            //Setting up a 'blur' event on Input Number Text Box
+            const num = document.querySelector('#num');
+            num.addEventListener('blur', () => {
+                //calling findNum() to check whether input number is present in the Array or not
+                let output = findNum(num.value);
+                if(output){ //output == true
+                    console.log("Number Found");
+                    document.querySelector('#msg').innerText = "Number Found";
+                    document.querySelector('#add').disabled = true;
+                    document.querySelector('#edit').disabled = false;
+                    document.querySelector('#delete').disabled = false;
+                    document.querySelector('#view').disabled = true;
+                    document.querySelector('#oddpos').disabled = true;
+                }
+                else{ //output == false
+                    console.log("Number not Found");
+                    document.querySelector('#msg').innerText = "Number not Found";
+                    document.querySelector('#add').disabled = false;
+                    document.querySelector('#edit').disabled = false;
+                    document.querySelector('#delete').disabled = false;
+                    document.querySelector('#view').disabled = false;
+                    document.querySelector('#oddpos').disabled = false;
+                }
+            });
+            
+            //adding element to the Array
+            const add = document.querySelector('#add');
+            add.addEventListener('click', () => {
+                A.push(+document.querySelector('#num').value);
+                //by default input number gets added as a string so we use '+' to make it into int
+                //Can also use parseInt() to add the number as numeric
+                document.querySelector('#msg').innerText = "Number Added in the Array";
+                console.log(A);
+                document.querySelector('#add').disabled = true;
+                document.querySelector('#edit').disabled = true;
+                document.querySelector('#delete').disabled = true;
+                document.querySelector('#view').disabled = false;
+                document.querySelector('#oddpos').disabled = false;
+                // document.querySelector('#array').innerText = A;
+            });
+
+            //Changing a value from Array i.e. edit option
+            const edit = document.querySelector('#edit');
+            edit.addEventListener('click', () => {
+                let newValue = +window.prompt();
+                let allow = replaceValue(newValue);
+                if(allow){
+                    document.querySelector('#msg').innerText = "Value Updated";
+                    console.log(A);
+                    document.querySelector('#view').disabled = false;
+                    document.querySelector('#edit').disabled = true;
+                    document.querySelector('#delete').disabled = true;
+                }
+                else{
+                    console.log("Value can't be repeated");
+                    document.querySelector('#msg').innerText = "Value can't be repeated";
+                    document.querySelector('#view').disabled = false;
+                }
+                
+            });
+
+            //Deleting number from Array
+            const deletenum = document.querySelector('#delete');
+            deletenum.addEventListener('click', () => {
+                let num = document.querySelector('#num');
+                let output = deletevalue(+num.value);
+                if(output){
+                    console.log("Value Deleted");
+                    console.log(A);
+                    document.querySelector('#msg').innerText = "Value Deleted";
+                    document.querySelector('#view').disabled = false;
+                    document.querySelector('#edit').disabled = true;
+                    document.querySelector('#delete').disabled = true;
+                }
+            });
+            
+            //Show odd position Number from Array
+            const oddpos = document.querySelector('#oddpos');
+            oddpos.addEventListener('click', () => {
+                let output = showoddpos();
+                document.querySelector('#array').innerText = output;
+            });
+
+            //'view' wil display all elements of Array
+            const view = document.querySelector('#view');
+            view.addEventListener('click', () => {
+                document.querySelector('#array').innerText = A;
+            })
+
+            //Logic function for searching a particular number in the created Array
+            function findNum(x){
+                let output = false;
+                for(let i=0; i<A.length; i++){
+                    if(A[i] == x){
+                        output = true;
+                    }
+                }
+                return output;
+            }
+
+            //Replace function to edit value
+            function replaceValue(newVal){
+                let oldVal = document.querySelector('#num').value;
+                let allow = true;
+                for(let i=0; i<A.length; i++){
+                    if(A[i] == newVal){
+                        allow = false;
+                        break;
+                    }
+                }
+                if(allow){
+                    for(let i=0; i<A.length; i++){
+                        if(A[i] == oldVal){
+                            A[i] = newVal;
+                        }
+                    }
+                }
+                return allow;
+            }
+
+            //Deletenum function to delete value from the Array
+            function deletevalue(num){
+                for(let i=0; i<A.length; i++){
+                    if(A[i] == num){
+                        A.splice(i,1);
+                        break;
+                    }
+                }
+                return true;
+            }
+
+            //Displaying elements at odd position
+            function showoddpos(){
+                let content = "";
+                for(let i=0; i<A.length; i++){
+                    if((i+1)%2 == 1){
+                        content += A[i] + ",";
+                    }
+                }
+                return content;
+            }
+
+        });
+        
+    </script>
+</head>
+<body>
+    <input type="text" id="num" placeholder="Input Number">
+    <span id="msg"></span><br/><br/>
+    <button id="add" disabled>Add</button>
+    <button id="edit" disabled>Edit</button>
+    <button id="delete" disabled>Delete</button>
+    <button id="view">View all</button>
+    <button id="oddpos">Show Odd Positions</button>
+    <br/><br/>
+    <span id="array"></span>
+</body>
+</html>

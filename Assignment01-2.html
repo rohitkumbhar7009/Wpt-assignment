@@ -1,0 +1,276 @@
+<html>
+<head>
+<script>
+
+
+const emp=[ {empno:1,empname:"vaibhav",email:"abc@gmail.com",deptid:01},
+{empno:2,empname:"vishal",email:"def@gmail.com",deptid:02},
+{empno:3,empname:"yogesh",email:"ghi@gmail.com",deptid:03},
+{empno:4,empname:"vikas",email:"jkl@gmail.com",deptid:04}]; //assume this is databse list of arrays..
+
+
+window.addEventListener('DOMContentLoaded', ()=>{
+showAllItems();
+
+
+
+
+const empnoid = document.querySelector("#empno");
+empnoid.addEventListener('blur',()=>{
+console.log("blur event");
+
+//intellligence begins
+let empno= document.querySelector("#empno").value;
+console.log("input is" + empno);
+let output= getEmpDetailsLogic(empno);
+//if result is false, then assume itemno is not found, else assum eitemno is found
+
+//intelligence ends here.
+
+//after you know the output.. think how page chages.
+if(output.result)
+{
+	document.querySelector("#empname").value=output.EmpDetails.empname;
+	document.querySelector("#email").value=output.EmpDetails.email;
+	document.querySelector("#deptid").value=output.EmpDetails.deptid;
+	
+	document.querySelector("#add").disabled=true;
+	document.querySelector("#update").disabled=false;
+	document.querySelector("#delete").disabled=false;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+	document.querySelector("#msg").innerText="emp details found";
+
+}
+else
+{
+	console.log("no emp was found");
+		document.querySelector("#add").disabled=false;
+	document.querySelector("#update").disabled=true;
+	document.querySelector("#delete").disabled=true;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+	document.querySelector("#msg").innerText="Emp not found";
+	document.querySelector("#empname").value="";
+	document.querySelector("#email").value="";
+	document.querySelector("#deptid").value="";
+	
+
+
+}
+});
+
+let add = document.querySelector("#add");
+     add.addEventListener('click',()=>{
+
+    let num1 ={empno:document.querySelector("#empno").value,
+        ename:document.querySelector("#empname").value,
+        email:document.querySelector("#email").value,
+         deptno:document.querySelector("#deptid").value};
+                    
+        let added=false;
+        added = addDetails(num);
+
+        if(added)
+        {
+        	document.querySelector("#msg").innerHTML="Emp added";
+             document.querySelector("#update").disabled=false;
+            document.querySelector("#delete").disabled=false;
+			document.querySelector("#view_all").disabled=false;
+    	 }
+});
+
+
+const update = document.querySelector("#update");
+update.addEventListener('click',()=>{
+
+//intelligence begins
+let input= {empno:document.querySelector("#empno").value,
+empname:document.querySelector("#empname").value,
+email:document.querySelector("#email").value,
+deptid:document.querySelector("#deptid").value};
+console.log(input);
+let output=updateEmpDetailsLogic(input);
+
+if(output)
+{
+document.querySelector("#msg").innerText="update suceeded";
+	document.querySelector("#add").disabled=true;
+	document.querySelector("#update").disabled=true;
+	document.querySelector("#delete").disabled=true;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+	document.querySelector("#empno").value="";
+	document.querySelector("#empname").value="";
+	document.querySelector("#email").value="";
+	document.querySelector("#deptid").value="";
+
+}
+else
+{
+document.querySelector("#msg").innerText="update failed";
+
+document.querySelector("#add").disabled=true;
+	document.querySelector("#update").disabled=true;
+	document.querySelector("#delete").disabled=true;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+
+}
+showAllItems();
+
+
+});
+
+const deletebutton = document.querySelector("#delete");
+deletebutton.addEventListener('click',()=>{
+let input= document.querySelector("#empno").value;
+
+console.log(input);
+
+console.log("after delete function" + output);
+
+if(output)
+{
+document.querySelector("#msg").innerText="delete suceeded bravery";
+document.querySelector("#add").disabled=true;
+	document.querySelector("#update").disabled=true;
+	document.querySelector("#delete").disabled=true;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+	document.querySelector("#empno").value="";
+	document.querySelector("#empname").value="";
+	document.querySelector("#email").value="";
+	document.querySelector("#deptid").value="";
+
+}
+else
+{
+document.querySelector("#msg").innerText="delete failed";
+
+document.querySelector("#add").disabled=true;
+	document.querySelector("#update").disabled=true;
+	document.querySelector("#delete").disabled=true;
+	document.querySelector("#view_all").disabled=true;
+	document.querySelector("#view_on_deptid").disabled=true;
+
+}
+showAllItems();
+
+});
+
+
+
+const view_all = document.querySelector("#view_all");
+view_all.addEventListener('click',()=>{
+console.log("view_all event");
+
+});//end of event handling setup for buttons
+
+function addDetails(num)
+    {
+        emp.push(num);
+        return true;
+    }
+
+function showAllItems()
+{
+console.log("show all emp");
+	
+	
+	let output=emp;
+	
+	
+	
+	let msg="";
+	for(let i=0; i < output.length; i++) //dinosaur way..
+	  msg+= "<Br/>" + output[i].empno +  " --- " + output[i].empname +
+	  "--"+ output[i].email+"---" +output[i].deptid;
+	  
+	  document.querySelector("#contents").innerHTML=msg;
+
+
+}
+
+function getEmpDetailsLogic(empno)
+{
+let output ={ result:false, EmpDetails:{}};
+for(let i=0; i < emp.length; i++)
+{
+if(emp[i].empno == empno )
+{	
+	output.result=true;
+	output.EmpDetails=emp[i];
+	break;
+}
+
+}
+return output;
+}
+
+
+
+function removeEmpDetailsLogic(empno)
+{
+let output =false;
+for(let i=0; i < emp.length; i++)
+{
+if(emp[i].empno == empno )
+{	
+	emp.splice(i,1); // which position, how many elements to remove
+	output=true;
+	break;
+}
+
+}
+console.log("inside delte function" + output);
+return output;
+}
+
+
+
+function updateEmpDetailsLogic(updatedemp)
+{
+console.log(updatedemp.empno);
+let output =false;
+for(let i=0; i < emp.length; i++)
+{
+console.log("in for loop " + emp[i].empno + "  " + updatedemp.empno);
+if(emp[i].empno == updatedemp.empno )
+{	
+
+	emp[i].empno=updatedemp.empno ;// which position, how many elements to remove
+	emp[i].empname=updatedemp.empname;
+	emp[i].email=updatedemp.email;
+	emp[i].deptid=updatedemp.deptid;
+	output=true;
+	
+	break; 
+}
+
+}
+console.log("inside update function" + output);
+return output;
+}
+});
+
+</script>
+<style>
+</style>
+</head>
+<body>
+<h1> Assignment Question No 2)</h1>
+<hr/>
+<input type="text" id="empno" placeholder="empno "/>  <span id="msg"> epm added</span>
+<Br/><input type="text" id="empname" placeholder="empname "/>
+<Br/><input type="text" id="email" placeholder="email "/>
+<Br/><input type="text" id="deptid" placeholder="deptid "/>
+<Br/><button id="add" disabled> Add Emp </button>
+<button id="update" disabled> Modify emp</button>
+<button id="delete" disabled> remove emp  </button>
+<button id="view_all" disabled> view_all </button>
+<button id="view_on_deptid" disabled> view on deptid </button>
+<hr/>
+<p id="contents" > here one day we will show contents </p>
+</body>
+</html>
